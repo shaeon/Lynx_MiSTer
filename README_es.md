@@ -17,9 +17,10 @@ Port a MiSTer: Shaeon (Carlos Palmero).
   `/media/fat/games/Lynx/`. Las dos se cargan solas al arrancar el core.
 - Las cintas (`.tzx`) y los discos (`.ldf`) pueden ir en la misma carpeta.
 
-En [roms/README.md](roms/README.md) está qué lleva cada fichero de ROM. La ROM
-de la disquetera (XDOS) **todavía no está incluida**, así que la disquetera no
-funciona hasta que se añada (ahí se explica cómo).
+En [roms/README.md](roms/README.md) está qué lleva cada fichero de ROM. Están
+montadas a partir de los juegos de ROMs de MAME (`lynx48k`, `lynx96k`,
+`lynx128k`) e incluyen la ROM de la disquetera (XDOS): escribe `XROM` para
+arrancar el DOS del Lynx.
 
 ## OSD
 
@@ -111,8 +112,8 @@ Dentro de ellos no se parchea nada.
   [lynx2wav](https://github.com/RW-FPGA-devel-Team/lynx2wav); y gracias a toda
   la comunidad de RetroWiki por mantener vivo el Lynx.
 - Los colaboradores de [Lynx48_MiSTer](https://github.com/MiSTer-devel/Lynx48_MiSTer)
-  (rampa069, JasonA, JimmyStones, alanswx): las ROMs salen de ese repositorio.
-- MAME (driver camplynx) por la documentación y las sumas de las ROMs; Jynx,
+  (rampa069, JasonA, JimmyStones, alanswx).
+- MAME (driver camplynx) y quienes volcaron las ROMs del Lynx; Jynx,
   PALE y quienes han documentado el Lynx (Pete Todd, el análisis de la ROM de
   w5Mike).
 - T80 (Daniel Wallner, MikeJ y otros), UM6845R y WD1793 (desarrolladores de

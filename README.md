@@ -19,9 +19,9 @@ Documentation in Spanish: [README_es.md](README_es.md).
   `/media/fat/games/Lynx/`. Both are loaded automatically when the core starts.
 - Tapes (`.tzx`) and disks (`.ldf`) can go in the same folder.
 
-See [roms/README.md](roms/README.md) for what each ROM file contains.
-The disk ROM (XDOS) is **not included yet**, so the disk drive does not work
-until it is added (instructions there).
+See [roms/README.md](roms/README.md) for what each ROM file contains. They are
+built from the MAME ROM sets (`lynx48k`, `lynx96k`, `lynx128k`) and include
+the disk ROM (XDOS): type `XROM` to start the Lynx DOS.
 
 ## OSD
 
@@ -110,9 +110,8 @@ and commit the new submodule pointers. Nothing is patched inside them.
   [lynx2wav](https://github.com/RW-FPGA-devel-Team/lynx2wav); and thanks to
   the whole RetroWiki community for keeping the Lynx alive.
 - The [Lynx48_MiSTer](https://github.com/MiSTer-devel/Lynx48_MiSTer)
-  contributors (rampa069, JasonA, JimmyStones, alanswx): the ROMs come from
-  that repository.
-- MAME (camplynx driver) for the ROM documentation and checksums; Jynx, PALE
+  contributors (rampa069, JasonA, JimmyStones, alanswx).
+- MAME (camplynx driver) and the people who dumped the Lynx ROMs; Jynx, PALE
   and the people who documented the Lynx (Pete Todd, w5Mike's ROM analysis).
 - T80 (Daniel Wallner, MikeJ and others), UM6845R and WD1793 (MiSTer
   developers, Sorgelig), tzxplayer (György Szombathelyi), and the MiSTer

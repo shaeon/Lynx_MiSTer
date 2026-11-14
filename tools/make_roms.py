@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # Monta roms/boot.rom (Lynx 48K/96K) y roms/boot1.rom (Lynx 128K) a partir de
-# las ROMs sueltas de roms/src. Si existe roms/src/dosrom.rom (DOS de la
-# disquetera, la que se activa con XROM), se mete en la pagina XDOS de las dos;
-# si no, esa pagina queda a 0xFF.
+# las ROMs sueltas de roms/src (los nombres son los de MAME). dosrom.rom (DOS
+# de la disquetera, la que se activa con XROM) va en la pagina XDOS de las dos;
+# si no estuviera, esa pagina queda a 0xFF. Las ROMs de menos de 8K (la 3a del
+# 96K tiene 4K) se rellenan con 0xFF, como hace MAME.
 #
 #   python3 tools/make_roms.py
 #
@@ -31,11 +32,11 @@ dos = page('dosrom.rom', optional=True)
 if dos == b'\xff' * 8192:
     print('aviso: no hay roms/src/dosrom.rom, la pagina XDOS queda vacia')
 
-boot = b''.join([page('lynx48-1.rom'), page('lynx48-2.rom'),
-                 page('lynx96-1.rom'), page('lynx96-2.rom'),
-                 page('lynx96-3.rom'), page('lynx96-3-scorpion.rom'),
+boot = b''.join([page('lynx48-1.ic46'), page('lynx48-2.ic45'),
+                 page('lynx9646.ic46'), page('lynx9645.ic45'),
+                 page('lynx9644.ic44'), page('skorprom.ic44'),
                  dos, b'\xff' * 8192])
-boot1 = b''.join([page('lynx128-1.rom'), page('lynx128-2.rom'), page('lynx128-3.rom'), dos])
+boot1 = b''.join([page('lynx128-1.ic1'), page('lynx128-2.ic2'), page('lynx128-3.ic3'), dos])
 
 for name, data in (('boot.rom', boot), ('boot1.rom', boot1)):
     open(os.path.join(dst, name), 'wb').write(data)
