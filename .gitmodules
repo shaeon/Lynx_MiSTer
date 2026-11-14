@@ -1,0 +1,6 @@
+[submodule "rtl/lynx"]
+	path = rtl/lynx
+	url = https://github.com/Kyp069/lynx.git
+[submodule "rtl/lynx128"]
+	path = rtl/lynx128
+	url = https://github.com/Kyp069/lynx128.git
