@@ -8,6 +8,10 @@
 // Además: bucles de la cinta (0x24/0x25), el bloque 0x2A solo para la cinta si stop48 = 1, y
 // ficheros TAP: si el fichero no empieza por "ZXTape!", se le entrega a tzxplayer un TZX
 // equivalente generado al vuelo (cabecera y un bloque 0x10 con 1 s de pausa por cada bloque).
+//
+// Lynx core (Lynx48_MiSTer): a file that is not a TZX is a Lynx .TAP, played by rtl/lynx_tap.sv
+// through the ext_* byte port below (same DDR3 buffer and cache); the Spectrum TAP -> TZX
+// conversion of the ZXP3 version is not used here (tzxplayer does not start for a TAP).
 //-------------------------------------------------------------------------------------------------
 module tape_ddr
 #(
@@ -30,6 +34,14 @@ module tape_ddr
 	input  wire        stop48,          // 1: el bloque 0x2A ("parar si es un 48K") para la cinta
 	output wire        busy,            // cinta en marcha
 	output wire        tape,            // señal EAR
+
+	// Lynx TAP: byte port for rtl/lynx_tap.sv (used while the image is not a TZX)
+	output wire        is_tap,          // the image is not a TZX
+	output wire [27:0] tap_size,        // bytes loaded
+	input  wire [24:0] ext_a,
+	input  wire        ext_req,
+	output wire        ext_ack,
+	output wire [ 7:0] ext_q,
 
 	// DDR3
 	output wire        DDRAM_CLK,
@@ -67,7 +79,9 @@ module tape_ddr
 	reg        cacheV = 1'b0;
 	reg        reading = 1'b0;
 
-	wire       hit = cacheV && cacheA == a[27:3];
+	wire       isTap;
+	wire [27:0] rdA = isTap ? { 3'b000, ext_a } : a;   // cache address: lynx_tap or tzxplayer
+	wire       hit = cacheV && cacheA == rdA[27:3];
 
 	// cabecera TZX: "ZXTape!" + 0x1A + versión 1.20
 	function [7:0] tzxHdr(input [3:0] i);
@@ -85,8 +99,13 @@ module tape_ddr
 		else if(dlW && dl && dlA < 8 && dlD != tzxHdr(dlA[3:0])) sigOk <= 1'b0;
 		else if(!dl && dlP && size < 8) sigOk <= 1'b0;
 	end
-	wire isTap = !sigOk;
-	wire [7:0] q = cacheD[{ a[2:0], 3'b000 } +: 8];
+	assign isTap = !sigOk;
+	wire [7:0] q = cacheD[{ rdA[2:0], 3'b000 } +: 8];
+
+	assign is_tap   = isTap;
+	assign tap_size = size;
+	assign ext_ack  = isTap && ext_req && hit && !dl;
+	assign ext_q    = q;
 
 	always @(posedge clock) begin
 		if(!DDRAM_BUSY) begin
@@ -107,8 +126,8 @@ module tape_ddr
 			end
 		end
 		else if(!ramWE && !ramRD && !reading && !hit) begin
-			ramA    <= a[27:3];
-			cacheA  <= a[27:3];
+			ramA    <= rdA[27:3];
+			cacheA  <= rdA[27:3];
 			cacheV  <= 1'b0;
 			ramRD   <= 1'b1;
 			reading <= 1'b1;
@@ -143,7 +162,7 @@ module tape_ddr
 	always @(posedge clock) begin
 		restart <= 1'b0;
 
-		if(play && !dl) begin
+		if(play && !dl && !isTap) begin
 			a <= 1'd0;
 			fetch <= 1'b0;
 			tapSt <= sHDR;

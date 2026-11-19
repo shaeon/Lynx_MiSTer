@@ -2,23 +2,28 @@
 #
 # rtl/lynx y rtl/lynx128: cores de Kyp (submodulos, sin cambios). De rtl/lynx
 # se usan los modulos comunes a los dos (son identicos en ambos repositorios).
-# rtl/gen: lynx.v + video.v de cada core con los modulos renombrados; los
-# genera rtl/pre_flow.tcl antes de cada compilacion.
+# rtl/gen: lynx.v + video.v de cada core (renombrados) y matrix.v, con las
+# correcciones de rtl/kyp_fixes.tcl; los genera rtl/pre_flow.tcl antes de cada
+# compilacion.
 
 set_global_assignment -name QIP_FILE           rtl/lynx/T80/T80.qip
 set_global_assignment -name VERILOG_FILE       rtl/lynx/cpu.v
 set_global_assignment -name VERILOG_FILE       rtl/lynx/ps2k.v
-set_global_assignment -name VERILOG_FILE       rtl/lynx/matrix.v
 set_global_assignment -name VERILOG_FILE       rtl/lynx/UM6845R.v
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/lynx/wd1793.sv
+set_global_assignment -name VERILOG_FILE       rtl/gen/matrix.v
 set_global_assignment -name VERILOG_FILE       rtl/gen/lynx48.v
 set_global_assignment -name VERILOG_FILE       rtl/gen/lynx128.v
 
-set_global_assignment -name QIP_FILE           rtl/pll.qip
-set_global_assignment -name VERILOG_FILE       rtl/sdram_mister.v
 set_global_assignment -name VERILOG_FILE       rtl/vram.v
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/tape_ddr.sv
-set_global_assignment -name VHDL_FILE          rtl/tzxplayer.vhd
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/lynx_core.sv
 
+set_global_assignment -name VHDL_FILE          rtl/tzxplayer.vhd
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/tape_ddr.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/lynx_tap.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/lynx_wav.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/lynx_tape_overlay.sv
+
+set_global_assignment -name QIP_FILE           rtl/pll.qip
 set_global_assignment -name SDC_FILE           Lynx.sdc
 set_global_assignment -name SYSTEMVERILOG_FILE Lynx.sv

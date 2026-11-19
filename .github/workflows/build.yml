@@ -56,14 +56,6 @@ jobs:
           docker run --rm -v "$GITHUB_WORKSPACE":/build -w /build raetro/quartus:17.0 \
             quartus_sh --flow compile Lynx
 
-      - name: Detalle de tiempos de la SDRAM
-        if: always()
-        run: |
-          if [ -f output_files/Lynx.sta.rpt ]; then
-            docker run --rm -v "$GITHUB_WORKSPACE":/build -w /build raetro/quartus:17.0 \
-              quartus_sta -t tools/rutas_sdram.tcl
-          fi
-
       # Resumen de tiempos en la pagina de la ejecucion; aviso si alguna
       # holgura es negativa (no para la compilacion: el .rbf sale igual)
       - name: Resumen de tiempos
@@ -81,7 +73,7 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           if sed -n '/Setup Summary/,/Removal Summary/p' "$STA" | grep -qE ';[[:space:]]*-[0-9]+\.[0-9]+[[:space:]]*;'; then
-            echo "::warning title=Tiempos::Hay holguras negativas: revisa Lynx.sta.rpt y rutas_sdram.txt"
+            echo "::warning title=Tiempos::Hay holguras negativas: revisa Lynx.sta.rpt"
           fi
 
       - name: Preparar el resultado
@@ -93,7 +85,6 @@ jobs:
           for r in map fit sta flow asm; do
             [ -f output_files/Lynx.$r.rpt ] && cp output_files/Lynx.$r.rpt dist/
           done
-          [ -f output_files/rutas_sdram.txt ] && cp output_files/rutas_sdram.txt dist/
           ls -la dist
 
       - name: Subir el resultado
