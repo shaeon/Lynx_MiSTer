@@ -298,7 +298,22 @@ always @(posedge clk_sys) tzx_div <= tzx_div + 1'd1;
 wire tzx_ce = turbo || tzx_div == 0;
 
 
-tape_ddr #(.MS(12000)) tape_ddr
+// Zona de la DDR3 para la cinta: 0x30000000 en la DE10-Nano (1 GB). En placas con menos memoria
+// (Chameleon96, 512 MB) se da con macros en el .qsf, por ejemplo:
+//   set_global_assignment -name VERILOG_MACRO "TAPE_DDR_BASE=32'h1BC00000"
+//   set_global_assignment -name VERILOG_MACRO "TAPE_DDR_SIZE=32'h00800000"
+`ifdef TAPE_DDR_BASE
+localparam [31:0] TAPE_BASE = `TAPE_DDR_BASE;
+`else
+localparam [31:0] TAPE_BASE = 32'h30000000;
+`endif
+`ifdef TAPE_DDR_SIZE
+localparam [31:0] TAPE_SIZE = `TAPE_DDR_SIZE;
+`else
+localparam [31:0] TAPE_SIZE = 32'h08000000;
+`endif
+
+tape_ddr #(.MS(12000), .BASE(TAPE_BASE), .SIZE(TAPE_SIZE)) tape_ddr
 (
 	.clock           (clk_sys           ),
 	.ce              (tzx_ce            ),
