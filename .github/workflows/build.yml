@@ -7,6 +7,14 @@
 # - push a main: ademas guarda el RBF en releases/ con un commit.
 # - Lanzar a mano: Actions > Build > Run workflow.
 # - Release: git tag v1.0 && git push origin v1.0
+# - Solo se ejecuta en shaeon/Lynx_MiSTer. El repositorio de la Chameleon96
+#   (shaeon/Lynx_MiSTer_ch96) se sincroniza con este y lleva este mismo
+#   fichero sin cambios, pero alli compila su propio workflow (build_ch96.yml).
+#
+# Node.js: GitHub ha retirado Node 20 en los runners. Todas las acciones van en
+# versiones que ya funcionan con Node 24 (checkout@v6, upload-artifact@v6,
+# action-gh-release@v3) y FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 obliga a usar
+# Node 24 con cualquier otra, para que no salga el aviso de Node 20.
 
 name: Build
 
@@ -17,18 +25,28 @@ on:
     paths-ignore:
       - '**.md'
       - 'releases/**'
+      - 'docs/**'
+      - 'sim/**'
+      - 'tools/**'
   pull_request:
     branches: [main]
     paths-ignore:
       - '**.md'
       - 'releases/**'
+      - 'docs/**'
+      - 'sim/**'
+      - 'tools/**'
   workflow_dispatch:
 
 permissions:
   contents: write          # para crear la Release en las etiquetas v*
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
+    if: github.repository == 'shaeon/Lynx_MiSTer'
     runs-on: ubuntu-latest
     timeout-minutes: 150
 
@@ -43,7 +61,7 @@ jobs:
 
       # los cores de Kyp son submodulos (rtl/lynx y rtl/lynx128, con el T80 anidado)
       - name: Descargar el repositorio con los submodulos
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -56,6 +74,19 @@ jobs:
         run: |
           docker run --rm -v "$GITHUB_WORKSPACE":/build -w /build raetro/quartus:17.0 \
             quartus_sh --flow compile Lynx
+
+      # Si falla, saca los errores de Quartus como anotaciones y en el resumen
+      - name: Errores de Quartus
+        if: failure()
+        run: |
+          ERR=$(cat output_files/Lynx.*.rpt 2>/dev/null | grep -E '^(Error|Critical Warning) \(' | sort -u | head -40)
+          {
+            echo "## Errores de Quartus"
+            echo '```'
+            echo "${ERR:-No hay informes: mira el log del paso Compilar}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "$ERR" | grep '^Error' | head -10 | while read -r l; do echo "::error title=Quartus::$l"; done
 
       # Resumen de tiempos en la pagina de la ejecucion; aviso si alguna
       # holgura es negativa (no para la compilacion: el .rbf sale igual)
@@ -90,7 +121,7 @@ jobs:
 
       - name: Subir el resultado
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Lynx-${{ github.sha }}
           path: dist/
@@ -100,7 +131,7 @@ jobs:
       # a nombre del autor del repo. Ese commit solo toca releases/, que esta en
       # paths-ignore, asi que no vuelve a lanzar la compilacion.
       - name: Guardar el RBF en releases/
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           ls dist/Lynx_*.rbf >/dev/null 2>&1 || { echo "No hay RBF"; exit 1; }
           mkdir -p releases
@@ -118,7 +149,7 @@ jobs:
 
       - name: Crear la Release (etiquetas v*)
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist/Lynx_*.rbf
           generate_release_notes: true
