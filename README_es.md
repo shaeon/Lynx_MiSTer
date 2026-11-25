@@ -100,7 +100,7 @@ ROMs (64K + 32K), RAM (64K + el banco 4 del 128K) y memoria de vídeo.
 
 aplicando las correcciones que haya en `tools/kyp_fixes.py` (que se vuelcan en
 `rtl/kyp_fixes.tcl`). Ahora la lista está vacía: Kyp ha metido en sus cores
-(Kyp069/lynx dd9bdce, Kyp069/lynx128 8e5adad) las correcciones que encontró
+(Kyp069/lynx dd9bdce, Kyp069/lynx128 55ecc58) las correcciones que encontró
 alanswx en Lynx48_MiSTer, que le mandamos como pull requests desde los forks
 [shaeon/lynx](https://github.com/shaeon/lynx) y
 [shaeon/lynx128](https://github.com/shaeon/lynx128):

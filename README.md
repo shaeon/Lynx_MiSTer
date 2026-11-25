@@ -99,7 +99,7 @@ tape, the keyboard, audio and video. Everything is in block RAM: ROMs (64K +
 
 applying the fixes listed in `tools/kyp_fixes.py` (written out to
 `rtl/kyp_fixes.tcl`). The list is empty now: Kyp has taken into his cores
-(Kyp069/lynx dd9bdce, Kyp069/lynx128 8e5adad) the fixes alanswx found in
+(Kyp069/lynx dd9bdce, Kyp069/lynx128 55ecc58) the fixes alanswx found in
 Lynx48_MiSTer, sent to him as pull requests from the forks
 [shaeon/lynx](https://github.com/shaeon/lynx) and
 [shaeon/lynx128](https://github.com/shaeon/lynx128):
